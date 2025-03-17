@@ -79,7 +79,7 @@ function Chat() {
 
   const currentChat = chats.find(chat => chat.id === activeChat);
 
-
+// hola 
   chats.map(chat => console.log("MESSAGES: ",chat.messages));
   return (
     <ThemeProvider theme={theme}>
