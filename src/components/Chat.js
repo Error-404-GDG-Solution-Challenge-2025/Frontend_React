@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Box, CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 import ChatInterface from './ChatInterface';
 import Sidebar from './Sidebar';
+import axios from 'axios';
 
 const theme = createTheme({
   palette: {
@@ -25,6 +26,7 @@ function Chat() {
   ]);
   const [activeChat, setActiveChat] = useState(1);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [ai_response, setAi_response] = useState("");
 
   const handleNewChat = () => {
     const newChat = {
@@ -56,6 +58,31 @@ function Chat() {
       ]
     };
 
+    // Call the python backend and retrieve the generated response from agent
+    axios.post('http://localhost:8000/generate', {
+      prompt: message
+    }).then(response => {
+      console.log("AI Response:", response.data);
+      setAi_response(response.data.generated_text);
+
+      // Update the chat with the AI response
+      setChats(prevChats => prevChats.map(chat =>
+        chat.id === activeChat ? {
+          ...chat,
+          messages: [...chat.messages, { role: 'assistant', content: response.data.generated_text }]
+        } : chat
+      ));
+    }).catch(error => {
+      console.error("Error calling API:", error);
+      // Handle error by showing a message to the user
+      setChats(prevChats => prevChats.map(chat =>
+        chat.id === activeChat ? {
+          ...chat,
+          messages: [...chat.messages, { role: 'assistant', content: "Sorry, I couldn't process your request. Please try again." }]
+        } : chat
+      ));
+    });
+
     // Update chat title if it's the first message
     if (currentChat.messages.length === 0) {
       updatedChat.title = message.slice(0, 30) + (message.length > 30 ? '...' : '');
@@ -65,27 +92,17 @@ function Chat() {
       chat.id === activeChat ? updatedChat : chat
     ));
 
-    // Simulate AI response
-    setTimeout(() => {
-      const aiResponse = "I'm a simulated response. In a real application, this would be connected to an AI API.";
-      setChats(prevChats => prevChats.map(chat =>
-        chat.id === activeChat ? {
-          ...chat,
-          messages: [...chat.messages, { role: 'assistant', content: aiResponse }]
-        } : chat
-      ));
-    }, 1000);
+    // Remove the setTimeout simulation since we're using the real API now
   };
 
   const currentChat = chats.find(chat => chat.id === activeChat);
 
-// hola 
-  chats.map(chat => console.log("MESSAGES: ",chat.messages));
+  chats.map(chat => console.log("MESSAGES: ", chat.messages));
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
-        
+
         <Sidebar
           open={isSidebarOpen}
           onClose={() => setIsSidebarOpen(false)}
