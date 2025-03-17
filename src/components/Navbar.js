@@ -1,8 +1,10 @@
 // components/Navbar.js
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { auth } from '../firebase';
+import { signOut } from 'firebase/auth';
 
-const Navbar = () => {
+const Navbar = ({ user, openModal }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [navbarBackground, setNavbarBackground] = useState('transparent');
 
@@ -12,6 +14,14 @@ const Navbar = () => {
 
   const closeMenu = () => {
     setIsMenuOpen(false);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
   };
 
   useEffect(() => {
@@ -50,6 +60,18 @@ const Navbar = () => {
               <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path>
             </svg>
           </a>
+          {user ? (
+            <>
+              <Link to="/chat" className="nav-link" onClick={closeMenu}>Chat</Link>
+              <button onClick={handleLogout} className="nav-link logout-button">
+                Logout
+              </button>
+            </>
+          ) : (
+            <button onClick={openModal} className="nav-link login-button">
+              Login
+            </button>
+          )}
         </div>
       </div>
     </nav>
