@@ -80,7 +80,7 @@ function Chat() {
   const currentChat = chats.find(chat => chat.id === activeChat);
 
 
-  chats.map(chat => console.log(chat.id, chat.title, chat.messages));
+  chats.map(chat => console.log("MESSAGES: ",chat.messages));
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -106,4 +106,4 @@ function Chat() {
   );
 }
 
-export default Chat; 
+export default Chat;

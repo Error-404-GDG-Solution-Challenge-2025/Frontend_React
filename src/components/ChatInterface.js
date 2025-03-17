@@ -10,22 +10,25 @@ import {
   CircularProgress,
 } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
-import MenuIcon from '@mui/icons-material/Menu';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import PersonIcon from '@mui/icons-material/Person';
+import MenuIcon from '@mui/icons-material/Menu';
 
-const ChatInterface = ({ messages, onSendMessage, isSidebarOpen, onToggleSidebar }) => {
+const ChatInterface = ({ messages, onSendMessage, onToggleSidebar }) => {
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
-  const inputRef = useRef(null);
-
+  const containerRef = useRef(null);
+  
+  // Function to scroll to bottom when needed
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (containerRef.current) {
+      containerRef.current.scrollTop = containerRef.current.scrollHeight;
+    }
   };
 
   useEffect(() => {
-    scrollToBottom();
+    scrollToBottom(); // Auto-scroll when messages update
   }, [messages]);
 
   const handleSubmit = (e) => {
@@ -46,59 +49,32 @@ const ChatInterface = ({ messages, onSendMessage, isSidebarOpen, onToggleSidebar
   };
 
   return (
-    <Box
-      component="main"
-      sx={{
-        flexGrow: 1,
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100vh',
-        backgroundColor: '#343541',
-        position: 'relative',
-      }}
-    >
-      <Box
-        sx={{
-          display: { xs: 'flex', sm: isSidebarOpen ? 'none' : 'flex' },
-          alignItems: 'center',
-          p: 2,
-          borderBottom: 1,
-          borderColor: 'divider',
-          backgroundColor: 'background.paper',
-        }}
-      >
+    <Box component="main" sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', height: '100vh', backgroundColor: '#343541', position: 'relative' }}>
+      {/* Add this new Box for the menu button */}
+      <Box sx={{ p: 2, display: 'flex', alignItems: 'center' }}>
         <IconButton
-          edge="start"
-          color="inherit"
-          aria-label="menu"
           onClick={onToggleSidebar}
-          sx={{ mr: 2 }}
+          sx={{ 
+            color: 'white',
+            '&:hover': { backgroundColor: 'rgba(255,255,255,0.1)' }
+          }}
         >
           <MenuIcon />
         </IconButton>
-        <Typography variant="h6" noWrap component="div">
-          Brand Name
-        </Typography>
       </Box>
 
       <Container
         maxWidth="md"
+        ref={containerRef} // Ref to enable scrolling
         sx={{
           flexGrow: 1,
-          overflow: 'auto',
+          overflowY: 'auto',
           py: 3,
           px: { xs: 2, sm: 3 },
-          scrollbarWidth: 'thin',
-          '&::-webkit-scrollbar': {
-            width: '8px',
-          },
-          '&::-webkit-scrollbar-track': {
-            background: '#2A2B32',
-          },
-          '&::-webkit-scrollbar-thumb': {
-            background: '#565869',
-            borderRadius: '4px',
-          },
+
+          /* Hide Scrollbar */
+          scrollbarWidth: 'none', // Firefox
+          '&::-webkit-scrollbar': { display: 'none' }, // Chrome, Safari, Edge
         }}
       >
         {messages.map((message, index) => (
@@ -139,16 +115,7 @@ const ChatInterface = ({ messages, onSendMessage, isSidebarOpen, onToggleSidebar
           </Box>
         ))}
         {isTyping && (
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 2,
-              p: 2,
-              backgroundColor: '#444654',
-              borderRadius: 1,
-            }}
-          >
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, p: 2, backgroundColor: '#444654', borderRadius: 1 }}>
             <Avatar sx={{ bgcolor: '#10a37f' }}>
               <SmartToyIcon />
             </Avatar>
@@ -180,26 +147,15 @@ const ChatInterface = ({ messages, onSendMessage, isSidebarOpen, onToggleSidebar
               placeholder="Send a message..."
               variant="outlined"
               size="small"
-              inputRef={inputRef}
               sx={{
                 '& .MuiOutlinedInput-root': {
                   backgroundColor: '#40414F',
                   color: 'white',
-                  '& fieldset': {
-                    borderColor: 'rgba(255,255,255,0.1)',
-                  },
-                  '&:hover fieldset': {
-                    borderColor: 'rgba(255,255,255,0.2)',
-                  },
-                  '&.Mui-focused fieldset': {
-                    borderColor: '#10a37f',
-                  },
+                  '& fieldset': { borderColor: 'rgba(255,255,255,0.1)' },
+                  '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.2)' },
+                  '&.Mui-focused fieldset': { borderColor: '#10a37f' },
                 },
-                '& .MuiOutlinedInput-input': {
-                  '&::placeholder': {
-                    color: 'rgba(255,255,255,0.5)',
-                  },
-                },
+                '& .MuiOutlinedInput-input::placeholder': { color: 'rgba(255,255,255,0.5)' },
               }}
             />
             <IconButton
@@ -209,9 +165,7 @@ const ChatInterface = ({ messages, onSendMessage, isSidebarOpen, onToggleSidebar
                 alignSelf: 'flex-end',
                 color: input.trim() ? '#10a37f' : 'rgba(255,255,255,0.3)',
                 mb: 0.5,
-                '&:hover': {
-                  backgroundColor: 'rgba(16, 163, 127, 0.1)',
-                },
+                '&:hover': { backgroundColor: 'rgba(16, 163, 127, 0.1)' },
               }}
             >
               <SendIcon />
@@ -223,4 +177,4 @@ const ChatInterface = ({ messages, onSendMessage, isSidebarOpen, onToggleSidebar
   );
 };
 
-export default ChatInterface; 
+export default ChatInterface;

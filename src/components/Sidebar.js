@@ -22,9 +22,13 @@ const drawerWidth = 260;
 const Sidebar = ({ open, onClose, onNewChat, chats = [], onDeleteChat, activeChat, onSelectChat }) => {
   return (
     <Drawer
-      variant="persistent"
+      variant="temporary"
       anchor="left"
       open={open}
+      onClose={onClose}
+      ModalProps={{
+        keepMounted: true, // Better performance on mobile
+      }}
       sx={{
         width: drawerWidth,
         flexShrink: 0,
@@ -33,6 +37,7 @@ const Sidebar = ({ open, onClose, onNewChat, chats = [], onDeleteChat, activeCha
           boxSizing: 'border-box',
           backgroundColor: '#202123',
           color: 'white',
+          transition: 'transform 0.3s ease-in-out',
         },
       }}
     >
@@ -116,4 +121,4 @@ const Sidebar = ({ open, onClose, onNewChat, chats = [], onDeleteChat, activeCha
   );
 };
 
-export default Sidebar; 
+export default Sidebar;
